@@ -1,0 +1,31 @@
+{
+  "name": "wa-go-ipfs",
+  "version": "0.1.0",
+  "description": "Simple temporary work around for `npm-go-ipfs` not working with electron builder..",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vaultec81/wa-go-ipfs.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vaultec81/wa-go-ipfs/issues"
+  },
+  "homepage": "https://github.com/vaultec81/wa-go-ipfs#readme",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "go-platform": "^1.0.0",
+    "gunzip-maybe": "^1.4.2",
+    "node-fetch": "^2.6.1",
+    "tar-fs": "^2.1.1",
+    "tar-stream": "^2.1.4",
+    "unzip-stream": "^0.3.1"
+  },
+  "devDependencies": {
+    "mocha": "^8.2.1"
+  }
+}
