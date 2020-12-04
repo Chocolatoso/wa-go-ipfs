@@ -164,6 +164,9 @@ module.exports = class {
         if(!installPath) {
             installPath = this.getDefaultPath();
         }
+        if(!fs.existsSync(Path.dirname(installPath))) {
+            fs.mkdirSync(Path.dirname(installPath))
+        }
         return await download({
             version, 
             platform: goenv.GOOS, 
