@@ -7,12 +7,12 @@ describe("go-ipfs", function() {
     this.timeout(240000);
     it("Install - temp path", async() => {
         var tempPath = Path.join(Tmp.dirSync().name, "ipfs");
-        const realPath = await goIPFS.install({installPath:tempPath})
+        const realPath = await goIPFS.install({installPath:tempPath, recursive: true})
         assert.strictEqual(realPath, tempPath)
         assert.strictEqual(fs.existsSync(realPath), true)
     })
     it("Install - default path", async() => {
-        const realPath = await goIPFS.install()
+        const realPath = await goIPFS.install({recursive: true})
         assert.strictEqual(fs.existsSync(realPath), true)
     })
 })

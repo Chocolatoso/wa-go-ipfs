@@ -153,7 +153,7 @@ module.exports = class {
      * @param {{version, path}}
      * @returns {String} IPFS Executable Path
      */
-    static async install({ version, installPath, progressHandler } = {}) {
+    static async install({ version, installPath, progressHandler, recursive } = {}) {
         if (!version) {
             console.warn("[Warn] IPFS version not specified. Installing latest... This may cause unexpected behaviour")
             const data = (await axios.get("https://dist.ipfs.io/go-ipfs/versions")).data;
@@ -161,11 +161,14 @@ module.exports = class {
             versions.pop();
             version = versions[versions.length - 1];
         }
+        if(!recursive) {
+            recursive = false
+        }
         if(!installPath) {
             installPath = this.getDefaultPath();
         }
         if(!fs.existsSync(Path.dirname(installPath))) {
-            fs.mkdirSync(Path.dirname(installPath))
+            fs.mkdirSync(Path.dirname(installPath), { recursive });
         }
         return await download({
             version, 
