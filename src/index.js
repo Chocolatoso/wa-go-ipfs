@@ -9,6 +9,23 @@ const unzip = require('unzip-stream')
 const os = require('os')
 const fs = require('fs')
 
+const goIpfsPaths = [
+    Path.resolve(Path.join(__dirname, '..', 'go-ipfs', 'ipfs')),
+    Path.resolve(Path.join(__dirname, '..', 'go-ipfs', 'ipfs.exe')),
+    Path.resolve(Path.join(__dirname, '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs.exe')),
+    Path.resolve(Path.join(__dirname, '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs')),
+    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs.exe')),
+    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs')),
+    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', '..', 'go-ipfs', 'go-ipfs', 'ipfs.exe')),
+    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', '..', 'go-ipfs', 'go-ipfs', 'ipfs'))
+]
+let devIpfsPath;
+for (const bin of goIpfsPaths) {
+    if (fs.existsSync(bin)) {
+        devIpfsPath = bin;
+    }
+}
+
 function unpack(url, installPath, stream) {
     return new Promise((resolve, reject) => {
         if (url.endsWith('.zip')) {
@@ -125,7 +142,14 @@ async function download({ version, platform, arch, installPath, distUrl }) {
     return Path.join(installPath/*, `ipfs${platform === 'windows' ? '.exe' : ''}`*/)
 }
 module.exports = class {
-    static getDefaultPath() {
+    static getDefaultPath({dev} = {}) {
+        if(dev === true) {
+            if(fs.existsSync(devIpfsPath)) {
+                return devIpfsPath;
+            } else {
+                throw new Error("IPFS is not installed (dev mode)");
+            }
+        }
         switch(goenv.GOOS) {
             case "windows": {
                 return Path.join(os.homedir(), "AppData/Roaming/Microsoft/Windows/Start Menu/Programs/go-ipfs/ipfs.exe");
@@ -153,7 +177,7 @@ module.exports = class {
      * @param {{version, path}}
      * @returns {String} IPFS Executable Path
      */
-    static async install({ version, installPath, progressHandler, recursive } = {}) {
+    static async install({ version, installPath, progressHandler, recursive, dev } = {}) {
         if (!version) {
             console.warn("[Warn] IPFS version not specified. Installing latest... This may cause unexpected behaviour")
             const data = (await axios.get("https://dist.ipfs.io/go-ipfs/versions")).data;
@@ -169,6 +193,13 @@ module.exports = class {
         }
         if(!fs.existsSync(Path.dirname(installPath))) {
             fs.mkdirSync(Path.dirname(installPath), { recursive });
+        }
+        if(dev === true) {
+            if(fs.existsSync(devIpfsPath)) {
+                return devIpfsPath;
+            } else {
+                throw new Error("IPFS is not installed (dev mode)");
+            }
         }
         return await download({
             version, 
