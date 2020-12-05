@@ -12,6 +12,8 @@ const fs = require('fs')
 const goIpfsPaths = [
     Path.resolve(Path.join(__dirname, '..', 'go-ipfs', 'ipfs')),
     Path.resolve(Path.join(__dirname, '..', 'go-ipfs', 'ipfs.exe')),
+    Path.resolve(Path.join(__dirname, '..', '..', 'go-ipfs', 'bin', 'ipfs')),
+    Path.resolve(Path.join(__dirname, '..', '..', 'go-ipfs', 'bin', 'ipfs.exe')),
     Path.resolve(Path.join(__dirname, '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs.exe')),
     Path.resolve(Path.join(__dirname, '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs')),
     Path.resolve(Path.join(__dirname, '..', '..', '..', '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs.exe')),
