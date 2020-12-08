@@ -143,6 +143,19 @@ async function download({ version, platform, arch, installPath, distUrl }) {
 
     return Path.join(installPath/*, `ipfs${platform === 'windows' ? '.exe' : ''}`*/)
 }
+/**
+ * Creates a directory and the path to the directory if necessary
+ * Use instead of mkDirSync(dir, {recursive: true})
+ * Issue: https://github.com/nodejs/node/issues/27293#issuecomment-521986527
+ * @param {string} dir
+ */
+const mkdirRecursive = dir => {
+    if (fs.existsSync(dir)) return
+    const dirname = Path.dirname(dir)
+    mkdirRecursive(dirname);
+    fs.mkdirSync(dir);
+  }
+  
 module.exports = class {
     static getDefaultPath({dev} = {}) {
         if(dev === true) {
@@ -194,7 +207,11 @@ module.exports = class {
             installPath = this.getDefaultPath();
         }
         if(!fs.existsSync(Path.dirname(installPath))) {
-            fs.mkdirSync(Path.dirname(installPath), { recursive });
+            if(recursive === true) {
+                mkdirRecursive(Path.dirname(installPath))
+            } else {
+                fs.mkdirSync(Path.dirname(installPath))
+            }
         }
         if(dev === true) {
             if(fs.existsSync(devIpfsPath)) {
