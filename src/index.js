@@ -1,5 +1,5 @@
 const axios = require('axios')
-const fetch = require('node-fetch')
+const fetch = require('node-fetch').default;
 const goenv = require('go-platform')
 const gunzip = require('gunzip-maybe')
 const Path = require('path')
@@ -206,18 +206,18 @@ module.exports = class {
         if(!installPath) {
             installPath = this.getDefaultPath();
         }
-        if(!fs.existsSync(Path.dirname(installPath))) {
-            if(recursive === true) {
-                mkdirRecursive(Path.dirname(installPath))
-            } else {
-                fs.mkdirSync(Path.dirname(installPath))
-            }
-        }
         if(dev === true) {
             if(fs.existsSync(devIpfsPath)) {
                 return devIpfsPath;
             } else {
                 throw new Error("IPFS is not installed (dev mode)");
+            }
+        }
+        if(!fs.existsSync(Path.dirname(installPath))) {
+            if(recursive === true) {
+                mkdirRecursive(Path.dirname(installPath))
+            } else {
+                fs.mkdirSync(Path.dirname(installPath))
             }
         }
         return await download({
