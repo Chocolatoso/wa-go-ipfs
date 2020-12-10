@@ -220,12 +220,16 @@ module.exports = class {
                 fs.mkdirSync(Path.dirname(installPath))
             }
         }
-        return await download({
+        var outPath = await download({
             version, 
             platform: goenv.GOOS, 
             arch: goenv.GOARCH, 
             installPath,
             distUrl:"https://dist.ipfs.io"
         })
+        if(goenv.GOOS === "darwin" || goenv.GOOS === "linux") {
+            fs.chmodSync(outPath, 755)
+        }
+        return outPath
     }
 }
