@@ -57,8 +57,8 @@ function unpack(url, installPath, stream) {
             // stream is the content body (might be an empty stream)
             // call next when you are done with this entry
             if(header.name === "go-ipfs/ipfs") {
-                await new Promise((resolve, reject) => {
-                    stream.pipe(fs.createWriteStream(Path.join(installPath))).on('ready', resolve).on('error', reject)
+                await new Promise((resolve2, reject2) => {
+                    stream.pipe(fs.createWriteStream(Path.join(installPath))).on('ready', resolve2).on('error', reject2)
                 })
             }
             stream.on('end', function() {
@@ -66,7 +66,7 @@ function unpack(url, installPath, stream) {
             })
             
             stream.resume() // just auto drain the stream
-        })
+        }).on('finish', resolve).on('error', reject)
         return stream
             .pipe(gunzip())
             .pipe(tar)
