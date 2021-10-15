@@ -27,6 +27,7 @@ for (const bin of goIpfsPaths) {
         devIpfsPath = bin;
     }
 }
+const ipfsDistUrl = "https://ipfs.3speak.tv/ipns/dist.ipfs.io"
 
 function unpack(url, installPath, stream) {
     return new Promise((resolve, reject) => {
@@ -78,7 +79,7 @@ function cleanArguments(version, platform, arch, installPath) {
         cwd: process.env.INIT_CWD || process.cwd(),
         defaults: {
             version: 'v' + pkg.version.replace(/-[0-9]+/, ''),
-            distUrl: 'https://dist.ipfs.io'
+            distUrl: ipfsDistUrl
         }
     })
 
@@ -195,7 +196,7 @@ module.exports = class {
     static async install({ version, installPath, progressHandler, recursive, dev } = {}) {
         if (!version) {
             console.warn("[Warn] IPFS version not specified. Installing latest... This may cause unexpected behaviour")
-            const data = (await axios.get("https://dist.ipfs.io/go-ipfs/versions")).data;
+            const data = (await axios.get(`${ipfsDistUrl}/go-ipfs/versions`)).data;
             const versions = data.split("\n");
             versions.pop();
             version = versions[versions.length - 1];
@@ -225,7 +226,7 @@ module.exports = class {
             platform: goenv.GOOS, 
             arch: goenv.GOARCH, 
             installPath,
-            distUrl:"https://dist.ipfs.io"
+            distUrl:ipfsDistUrl
         })
         if(goenv.GOOS === "darwin" || goenv.GOOS === "linux") {
             fs.chmodSync(outPath, 755)
