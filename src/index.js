@@ -27,7 +27,7 @@ for (const bin of goIpfsPaths) {
         devIpfsPath = bin;
     }
 }
-const ipfsDistUrl = "https://ipfs.3speak.tv/ipns/dist.ipfs.io"
+const ipfsDistUrl = "https://cloudflare-ipfs.com/ipns/dist.ipfs.io"
 
 function unpack(url, installPath, stream) {
     return new Promise((resolve, reject) => {
