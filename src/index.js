@@ -27,7 +27,8 @@ for (const bin of goIpfsPaths) {
         devIpfsPath = bin;
     }
 }
-const ipfsDistUrl = "https://cloudflare-ipfs.com/ipns/dist.ipfs.io"
+const ipfsDistUrls = ["ipfs.3speak.tv", "ipfs.tech", "cloudflare-ipfs.com"].map(e => (`https://${e}/ipns/dist.ipfs.io`))
+
 
 function unpack(url, installPath, stream) {
     return new Promise((resolve, reject) => {
@@ -125,11 +126,14 @@ async function getDownloadURL(version, platform, arch, distUrl) {
     const link = data.platforms[platform].archs[arch].link
     return `${distUrl}/go-ipfs/${version}${link}`
 }
-async function download({ version, platform, arch, installPath, distUrl }) {
+async function download({ version, platform, arch, installPath, distUrl, progressHandler }) {
     const url = await getDownloadURL(version, platform, arch, distUrl)
 
     console.info(`Downloading ${url}`)
 
+
+    const data = await axios.head(url)
+    
     const res = await fetch(url)
 
     if (!res.ok) {
@@ -137,6 +141,15 @@ async function download({ version, platform, arch, installPath, distUrl }) {
     }
 
     console.info(`Downloaded ${url}`)
+
+    let totalSize = 0;
+    res.body.on('data', (e) => {
+        totalSize = e.length + totalSize;
+        const pct = totalSize / Number(data.headers['content-length']);
+        if(progressHandler) {
+            progressHandler(Math.round(pct * 100))
+        }
+    })
 
     await unpack(url, installPath, res.body)
 
@@ -194,6 +207,18 @@ module.exports = class {
      * @returns {String} IPFS Executable Path
      */
     static async install({ version, installPath, progressHandler, recursive, dev } = {}) {
+        let ipfsDistUrl;
+        for(let url of ipfsDistUrls) {
+            try {
+                const {headers} = await axios.head(url)
+                if(headers['x-ipfs-roots']) {
+                    ipfsDistUrl = url;
+                    break;
+                }
+            } catch {
+
+            }
+        }
         if (!version) {
             console.warn("[Warn] IPFS version not specified. Installing latest... This may cause unexpected behaviour")
             const data = (await axios.get(`${ipfsDistUrl}/go-ipfs/versions`)).data;
@@ -226,7 +251,8 @@ module.exports = class {
             platform: goenv.GOOS, 
             arch: goenv.GOARCH, 
             installPath,
-            distUrl:ipfsDistUrl
+            distUrl:ipfsDistUrl,
+            progressHandler
         })
         if(goenv.GOOS === "darwin" || goenv.GOOS === "linux") {
             fs.chmodSync(outPath, 755)
