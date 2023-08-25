@@ -3,7 +3,7 @@ const assert = require('assert');
 const fs = require('fs');
 const Tmp = require('tmp');
 const Path = require('path')
-describe("go-ipfs", function() {
+describe("kubo", function() {
     this.timeout(240000);
     it("Install - temp path", async() => {
         var tempPath = Path.join(Tmp.dirSync().name, "ipfs");
