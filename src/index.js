@@ -43,7 +43,7 @@ function unpack(url, installPath, stream) {
                 unzip.Parse())
                     .on('entry', function(entry) {
                         var filePath = entry.path;
-                        if (filePath === "go-ipfs/ipfs.exe") {
+                        if (filePath === "kubo/ipfs.exe") {
                             entry.pipe(fs.createWriteStream(Path.join(installPath)));
                         } else {
                             entry.autodrain();
