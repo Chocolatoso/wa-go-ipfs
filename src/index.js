@@ -10,16 +10,16 @@ const os = require('os')
 const fs = require('fs')
 
 const goIpfsPaths = [
-    Path.resolve(Path.join(__dirname, '..', 'go-ipfs', 'ipfs')),
-    Path.resolve(Path.join(__dirname, '..', 'go-ipfs', 'ipfs.exe')),
-    Path.resolve(Path.join(__dirname, '..', '..', 'go-ipfs', 'bin', 'ipfs')),
-    Path.resolve(Path.join(__dirname, '..', '..', 'go-ipfs', 'bin', 'ipfs.exe')),
-    Path.resolve(Path.join(__dirname, '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs.exe')),
-    Path.resolve(Path.join(__dirname, '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs')),
-    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs.exe')),
-    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', 'node_modules', 'go-ipfs', 'go-ipfs', 'ipfs')),
-    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', '..', 'go-ipfs', 'go-ipfs', 'ipfs.exe')),
-    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', '..', 'go-ipfs', 'go-ipfs', 'ipfs'))
+    Path.resolve(Path.join(__dirname, '..', 'kubo', 'ipfs')),
+    Path.resolve(Path.join(__dirname, '..', 'kubo', 'ipfs.exe')),
+    Path.resolve(Path.join(__dirname, '..', '..', 'kubo', 'bin', 'ipfs')),
+    Path.resolve(Path.join(__dirname, '..', '..', 'kubo', 'bin', 'ipfs.exe')),
+    Path.resolve(Path.join(__dirname, '..', 'node_modules', 'kubo', 'kubo', 'ipfs.exe')),
+    Path.resolve(Path.join(__dirname, '..', 'node_modules', 'kubo', 'kubo', 'ipfs')),
+    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', 'node_modules', 'kubo', 'kubo', 'ipfs.exe')),
+    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', 'node_modules', 'kubo', 'kubo', 'ipfs')),
+    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', '..', 'kubo', 'kubo', 'ipfs.exe')),
+    Path.resolve(Path.join(__dirname, '..', '..', '..', '..', '..', 'kubo', 'kubo', 'ipfs'))
 ]
 let devIpfsPath;
 for (const bin of goIpfsPaths) {
@@ -58,7 +58,7 @@ function unpack(url, installPath, stream) {
             // header is the tar header
             // stream is the content body (might be an empty stream)
             // call next when you are done with this entry
-            if(header.name === "go-ipfs/ipfs") {
+            if(header.name === "kubo/ipfs") {
                 await new Promise((resolve2, reject2) => {
                     stream.pipe(fs.createWriteStream(Path.join(installPath))).on('ready', resolve2).on('error', reject2)
                 })
@@ -76,7 +76,7 @@ function unpack(url, installPath, stream) {
 }
 
 function cleanArguments(version, platform, arch, installPath) {
-    const conf = pkgConf.sync('go-ipfs', {
+    const conf = pkgConf.sync('kubo', {
         cwd: process.env.INIT_CWD || process.cwd(),
         defaults: {
             version: 'v' + pkg.version.replace(/-[0-9]+/, ''),
@@ -94,8 +94,8 @@ function cleanArguments(version, platform, arch, installPath) {
 }
 
 async function ensureVersion(version, distUrl) {
-    const res = await fetch(`${distUrl}/go-ipfs/versions`)
-    console.info(`${distUrl}/go-ipfs/versions`)
+    const res = await fetch(`${distUrl}/kubo/versions`)
+    console.info(`${distUrl}/kubo/versions`)
     if (!res.ok) {
         throw new Error(`Unexpected status: ${res.status}`)
     }
@@ -111,7 +111,7 @@ async function ensureVersion(version, distUrl) {
 async function getDownloadURL(version, platform, arch, distUrl) {
     await ensureVersion(version, distUrl)
 
-    const res = await fetch(`${distUrl}/go-ipfs/${version}/dist.json`)
+    const res = await fetch(`${distUrl}/kubo/${version}/dist.json`)
     if (!res.ok) throw new Error(`Unexpected status: ${res.status}`)
     const data = await res.json()
 
@@ -124,7 +124,7 @@ async function getDownloadURL(version, platform, arch, distUrl) {
     }
 
     const link = data.platforms[platform].archs[arch].link
-    return `${distUrl}/go-ipfs/${version}${link}`
+    return `${distUrl}/kubo/${version}${link}`
 }
 async function download({ version, platform, arch, installPath, distUrl, progressHandler }) {
     const url = await getDownloadURL(version, platform, arch, distUrl)
@@ -184,10 +184,10 @@ module.exports = class {
                 return Path.join(os.homedir(), "AppData/Roaming/Microsoft/Windows/Start Menu/Programs/go-ipfs/ipfs.exe");
             }
             case "darwin": {
-                return  Path.join(os.homedir(), "Applications/go-ipfs/ipfs");
+                return  Path.join(os.homedir(), "Applications/kubo/ipfs");
             }
             case "linux": {
-                return  Path.join(os.homedir(), "bin/go-ipfs/ipfs");
+                return  Path.join(os.homedir(), "bin/kubo/ipfs");
             }
         }
     }
@@ -221,7 +221,7 @@ module.exports = class {
         }
         if (!version) {
             console.warn("[Warn] IPFS version not specified. Installing latest... This may cause unexpected behaviour")
-            const data = (await axios.get(`${ipfsDistUrl}/go-ipfs/versions`)).data;
+            const data = (await axios.get(`${ipfsDistUrl}/kubo/versions`)).data;
             const versions = data.split("\n");
             versions.pop();
             version = versions[versions.length - 1];
